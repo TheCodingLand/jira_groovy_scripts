@@ -1,15 +1,6 @@
-import com.atlassian.jira.user.util.UserManager;
+
 import com.atlassian.jira.component.ComponentAccessor;
-import com.atlassian.jira.bc.user.search.UserSearchService;
-import com.atlassian.jira.user.ApplicationUser;
-import com.atlassian.jira.security.JiraAuthenticationContext;
-import com.atlassian.jira.bc.JiraServiceContextImpl;
-import com.atlassian.jira.bc.JiraServiceContext;
 import com.riadalabs.jira.plugins.insight.services.model.MutableObjectBean;
-
-
-
-
 import com.atlassian.jira.issue.fields.CustomField;
 import com.atlassian.jira.issue.Issue;
 import com.atlassian.jira.issue.MutableIssue;
@@ -147,12 +138,3 @@ insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\
 def insight_manager_id =insight_manager.getId()
 log.info("Manager object id is : " + insight_manager_id)
 SetInsightValue(log, object.getId(),201,insight_manager_id)
-/*modify_insight_reference_attribute(201,insight_manager)
-
-/*def userSearchService = ComponentAccessor.getComponent(UserSearchService);
-JiraAuthenticationContext context = ComponentAccessor.getJiraAuthenticationContext();
-ApplicationUser user = context.getLoggedInUser();
-JiraServiceContext jsc = new JiraServiceContextImpl(user);
-ApplicationUser applicationUser =userSearchService.getUserByName(jsc,test);                                    
-log.error(applicationUser);
-*/
