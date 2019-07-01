@@ -87,54 +87,6 @@ boolean SetInsightValue (def log, int InsightObjectId, int InsightAttributeId, d
 
 
 
-def modify_insight_attribute(int attributeNumber, value) { 
-       
-    def objectFacade = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.ObjectFacade"));
-    def objectTypeAttributeFacade = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.ObjectTypeAttributeFacade"));
-    def objectAttributeBeanFactory = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.services.model.factory.ObjectAttributeBeanFactory"));
-
-	def objectTypeAttributeBean = objectTypeAttributeFacade.loadObjectTypeAttributeBean(attributeNumber).createMutable() //The id of the attribute
-  /* Create the new attribute bean based on the value */
-	 def newObjectAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(object, objectTypeAttributeBean, value);
-        /* Load the attribute bean */
-        def objectAttributeBean = objectFacade.loadObjectAttributeBean(object.getId(), objectTypeAttributeBean.getId());
-        if (objectAttributeBean != null) {
-           /* If attribute exist reuse the old id for the new attribute */
-           newObjectAttributeBean.setId(objectAttributeBean.getId());
-        }
-/* Store the object attribute into Insight. */
-    try {
-        objectTypeAttributeBean = objectFacade.storeObjectAttributeBean(newObjectAttributeBean);
-    } catch (Exception vie) {
-        log.warn("Could not update object attribute due to validation exception:" + vie.getMessage());
-    }
-}
-
-def modify_insight_reference_attribute(int attributeNumber, int value) { 
-       
-      def objectFacade = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.ObjectFacade"));
-    def objectTypeAttributeFacade = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.ObjectTypeAttributeFacade"));
-    def objectAttributeBeanFactory = ComponentAccessor.getOSGiComponentInstanceOfType(ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.services.model.factory.ObjectAttributeBeanFactory"));
-
-	def objectTypeAttributeBean = objectTypeAttributeFacade.loadObjectTypeAttributeBean(attributeNumber).createMutable() //The id of the attribute
-  /* Create the new attribute bean based on the value */
-	 def newObjectAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(object, objectTypeAttributeBean, value);
-        /* Load the attribute bean */
-        def objectAttributeBean = objectFacade.loadObjectAttributeBean(object.getId(), objectTypeAttributeBean.getId());
-        if (objectAttributeBean != null) {
-           /* If attribute exist reuse the old id for the new attribute */
-           newObjectAttributeBean.setId(objectAttributeBean.getId());
-        }
-/* Store the object attribute into Insight. */
-    try {
-        objectTypeAttributeBean = objectFacade.storeObjectAttributeBean(newObjectAttributeBean);
-    } catch (Exception vie) {
-        log.warn("Could not update object attribute due to validation exception:" + vie.getMessage());
-    }
-}
-
-
-
 def get_field_from_iql_query(schemaid, iql, fieldid) {
     Class iqlFacadeClass = ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.IQLFacade"); 
 	def iqlFacade = ComponentAccessor.getOSGiComponentInstanceOfType(iqlFacadeClass);
@@ -162,17 +114,16 @@ final int insightUserAttributeIdFqdnManager = 202;
 final int insightUserAttributeIdName = 195; 
 final int customFieldApproversId = 10007;
 final int test_value_id = 208;
+final int account_field_id = 204;
 
 def token ="admin";
 
 
-modify_insight_attribute(test_value_id, "another value");
+SetInsightValue(log, object.getId(), test_value_id, "another test value");
 def fqdn_manager_value = get_field_from_iql_query(insightSchemaId, "objectType=\"Users\" AND \"Token\" IN (\""+token+"\")", insightUserAttributeIdFqdnManager);
 log.info(fqdn_manager_value)
 def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_manager_value+"\")", 204);
 log.info(manager_user_name)
-
-
 
 insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+manager_user_name+"\")",204)
 
