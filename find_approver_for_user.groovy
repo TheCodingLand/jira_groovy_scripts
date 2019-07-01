@@ -21,13 +21,6 @@ List<ApplicationUser> approvers = new ArrayList<ApplicationUser>();
 
 Class iqlFacadeClass = ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.IQLFacade"); 
 def iqlFacade = ComponentAccessor.getOSGiComponentInstanceOfType(iqlFacadeClass);
-try{
-/* Get reporter ApplicationUser (The current user of the app making the request) */
-def reporter = ComponentAccessor.getUserManager().getUserByKey(issue.reporterId);
-def display_name = reporter.getDisplayName()
-def token = reporter.getUsername()
-
-/* our Token field is the samAccountName */
 
 def get_field_from_iql_query(schemaid, iql, fieldid) {
     Class iqlFacadeClass = ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.IQLFacade"); 
@@ -44,11 +37,22 @@ def get_field_from_iql_query(schemaid, iql, fieldid) {
 	}
     }
 
+try{
+/* Get reporter ApplicationUser (The current user of the app making the request) */
+def reporter = ComponentAccessor.getUserManager().getUserByKey(issue.reporterId);
+def display_name = reporter.getDisplayName()
+def token = reporter.getUsername()
+
+/* our Token field is the samAccountName */
+
 
 def fqdn_of_Manager = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+token+"\") ",insightUserAttributeIdFqdnManager)
-
+log.info("FQDN of Manager : " + fqdn_of_Manager)
 def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_of_Manager+"\")",insightUserAttributeIdName)
+log.info("Manager User Name : " + manager_user_name)
 
+
+applicationUser = userSearchService.findUsersByFullName(manager_user_name)[0];
 /* Get the custom field for the approvers */
 def cfApprovers = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(customFieldApproversId);
 def cfApproversValue = issue.getCustomFieldValue(cfApprovers) ;
@@ -69,5 +73,6 @@ cfApprovers.updateValue(null, issue, new ModifiedValue("", approvers), changeHol
 issue.store();
 }catch(Exception ex){
     CommentManager commentMgr = ComponentAccessor.getCommentManager();
-    commentMgr.create(issue, ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser(), "No manager was found for approval", false)
+    commentMgr.create(issue, ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser(), "No manager was found for approval", false);
+    log.error("No manager was found for approval");
 }
