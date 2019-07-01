@@ -28,31 +28,26 @@ def display_name = reporter.getDisplayName()
 def token = reporter.getUsername()
 
 /* our Token field is the samAccountName */
-def objects = iqlFacade.findObjectsByIQLAndSchema(insightSchemaId, "objectType=\"Users\" AND \"Token\" IN (\""+token+"\") ");
 
-for(objectAttributeBean in objects[0].getObjectAttributeBeans()){
-    if(objectAttributeBean.getObjectTypeAttributeId() == insightUserAttributeIdFqdnManager){
-    try{
-        	fqdnManager = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
-        }catch(Exception ex){}
-    }
-}
+def get_field_from_iql_query(schemaid, iql, fieldid) {
+    Class iqlFacadeClass = ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.IQLFacade"); 
+	def iqlFacade = ComponentAccessor.getOSGiComponentInstanceOfType(iqlFacadeClass);
+    def objects = iqlFacade.findObjectsByIQLAndSchema(schemaid, iql);
 
-/* we look for a User whose FQDN matches our "managed by" field on the repording user. Thos fields have to be imported from LDAP */ 
-objects = iqlFacade.findObjectsByIQLAndSchema(insightSchemaId, "objectType=\"Users\" AND \"FQDN\" IN (\""+fqdnManager+"\")");
-for(objectAttributeBean in objects[0].getObjectAttributeBeans()){
-    if(objectAttributeBean.getObjectTypeAttributeId() == insightUserAttributeIdName){ /*variable declared on top of the file corresponding to the field id in insight*/
-    try{
-        userName = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
-        applicationUser = userSearchService.findUsersByFullName(userName)[0];
-      
-        if(applicationUser){
-            log.info("@@@@@ "+applicationUser);
+	for(objectAttributeBean in objects[0].getObjectAttributeBeans()){
+        if(objectAttributeBean.getObjectTypeAttributeId() == fieldid){
+        try{
+                value = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
+            	return value;
+            }catch(Exception ex){}
         }
-        
-        }catch(Exception ex){log.error(ex.toString());}
+	}
     }
-}
+
+
+def fqdn_of_Manager = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+token+"\") ",insightUserAttributeIdFqdnManager)
+
+def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_of_Manager+"\")",insightUserAttributeIdName)
 
 /* Get the custom field for the approvers */
 def cfApprovers = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(customFieldApproversId);
