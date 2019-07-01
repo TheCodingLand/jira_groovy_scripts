@@ -116,20 +116,36 @@ final int customFieldApproversId = 10007;
 final int test_value_id = 208;
 final int account_field_id = 204;
 
-def token ="admin";
+//def token ="C154564";
+def token =""
+
+for(objectAttributeBean in object.getObjectAttributeBeans()){
+    if(objectAttributeBean.getObjectTypeAttributeId() == account_field_id){
+    try{
+        token = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
+        }catch(Exception ex){}
+    }
+}
+log.info(" found token : " + token)
 
 
-SetInsightValue(log, object.getId(), test_value_id, "another test value");
+
+
+
+//SetInsightValue(log, object.getId(), test_value_id, "another test value");
+// Get the FAD
 def fqdn_manager_value = get_field_from_iql_query(insightSchemaId, "objectType=\"Users\" AND \"Token\" IN (\""+token+"\")", insightUserAttributeIdFqdnManager);
-log.info(fqdn_manager_value)
-def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_manager_value+"\")", 204);
-log.info(manager_user_name)
+log.info("FQDN manager for " + object.getName() + " is :" + fqdn_manager_value)
+def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_manager_value+"\")", account_field_id);
+log.info("Manager User Name is : " + manager_user_name)
 
-insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+manager_user_name+"\")",204)
+insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+manager_user_name+"\")",account_field_id)
 
-log.info("" + insight_manager.getId())
+
+
 /*modify_insight_attribute(201,insight_manager)*/
 def insight_manager_id =insight_manager.getId()
+log.info("Manager object id is : " + insight_manager_id)
 SetInsightValue(log, object.getId(),201,insight_manager_id)
 /*modify_insight_reference_attribute(201,insight_manager)
 
