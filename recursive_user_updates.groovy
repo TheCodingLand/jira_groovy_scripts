@@ -1,4 +1,3 @@
-
 import com.atlassian.jira.component.ComponentAccessor;
 import com.riadalabs.jira.plugins.insight.services.model.MutableObjectBean;
 import com.atlassian.jira.issue.fields.CustomField;
@@ -125,7 +124,7 @@ def get_object_from_iql_query(schemaid, iql, fieldid) {
     def objects = iqlFacade.findObjectsByIQLAndSchema(schemaid, iql);
     return objects[0]
     }
-def get_objects_from_iql_query(schemaid, iql, fieldid) {
+def get_objects_from_iql_query(schemaid, iql) {
     Class iqlFacadeClass = ComponentAccessor.getPluginAccessor().getClassLoader().findClass("com.riadalabs.jira.plugins.insight.channel.external.api.facade.IQLFacade"); 
 	def iqlFacade = ComponentAccessor.getOSGiComponentInstanceOfType(iqlFacadeClass);
     def objects = iqlFacade.findObjectsByIQLAndSchema(schemaid, iql);
@@ -133,20 +132,20 @@ def get_objects_from_iql_query(schemaid, iql, fieldid) {
     }
 
 
-public static int insightSchemaId = 1;
-public static int insightUserAttributeIdFqdnManager = 202;
-public static int insightUserAttributeIdName = 195; 
-public static int customFieldApproversId = 10007;
-public static int test_value_id = 208;
-public static int account_field_id = 204;
-public static int manager_field = 201;
-public static int user_status_code_field = 205; 
-public static int user_status_field = 206; 
+insightSchemaId = 1;
+insightUserAttributeIdFqdnManager = 202;
+insightUserAttributeIdName = 195; 
+customFieldApproversId = 10007;
+test_value_id = 208;
+account_field_id = 204;
+manager_field = 201;
+user_status_code_field = 205; 
+user_status_field = 206; 
 //def LoginName ="C154564";
-def LoginName =""
+
 
 def update_user(user) { 
-
+def LoginName =""
 
 for(objectAttributeBean in user.getObjectAttributeBeans()){
     if(objectAttributeBean.getObjectTypeAttributeId() == account_field_id){
@@ -167,6 +166,7 @@ SetInsightValue(log, user.getId(),user_status_field,user_state)
 // Get the FAD
 def fqdn_manager_value = get_field_from_iql_query(insightSchemaId, "objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\")", insightUserAttributeIdFqdnManager);
 log.info("FQDN manager for " + user.getName() + " is :" + fqdn_manager_value)
+if (fqdn_manager_value) { 
 def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_manager_value+"\")", account_field_id);
 log.info("Manager User Name is : " + manager_user_name)
 
@@ -179,10 +179,11 @@ log.info("Manager object id is : " + insight_manager_id)
 SetInsightValue(log, user.getId(),manager_field,insight_manager_id)
 
 }
-
+}
 
 users = get_objects_from_iql_query(insightSchemaId,"objectType=\"Users\"")
 
 for (user in users) {
+    log.info(user.getName())
     update_user(user);
 }
