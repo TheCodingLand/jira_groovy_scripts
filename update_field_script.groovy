@@ -106,18 +106,18 @@ final int insightUserAttributeIdName = 195;
 final int customFieldApproversId = 10007;
 final int test_value_id = 208;
 final int account_field_id = 204;
-
-//def token ="C154564";
-def token =""
+final int manager_field = 201;
+//def LoginName ="C154564";
+def LoginName =""
 
 for(objectAttributeBean in object.getObjectAttributeBeans()){
     if(objectAttributeBean.getObjectTypeAttributeId() == account_field_id){
     try{
-        token = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
+        LoginName = objectAttributeBean.getObjectAttributeValueBeans()[0].getValue();
         }catch(Exception ex){}
     }
 }
-log.info(" found token : " + token)
+log.info(" found LoginName : " + LoginName)
 
 
 
@@ -125,16 +125,16 @@ log.info(" found token : " + token)
 
 //SetInsightValue(log, object.getId(), test_value_id, "another test value");
 // Get the FAD
-def fqdn_manager_value = get_field_from_iql_query(insightSchemaId, "objectType=\"Users\" AND \"Token\" IN (\""+token+"\")", insightUserAttributeIdFqdnManager);
+def fqdn_manager_value = get_field_from_iql_query(insightSchemaId, "objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\")", insightUserAttributeIdFqdnManager);
 log.info("FQDN manager for " + object.getName() + " is :" + fqdn_manager_value)
 def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_manager_value+"\")", account_field_id);
 log.info("Manager User Name is : " + manager_user_name)
 
-insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+manager_user_name+"\")",account_field_id)
+insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+manager_user_name+"\")",account_field_id)
 
 
 
-/*modify_insight_attribute(201,insight_manager)*/
+/*modify_insight_attribute(manager_field,insight_manager)*/
 def insight_manager_id =insight_manager.getId()
 log.info("Manager object id is : " + insight_manager_id)
-SetInsightValue(log, object.getId(),201,insight_manager_id)
+SetInsightValue(log, object.getId(),,insight_manager_id)
