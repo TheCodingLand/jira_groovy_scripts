@@ -41,12 +41,12 @@ try{
 /* Get reporter ApplicationUser (The current user of the app making the request) */
 def reporter = ComponentAccessor.getUserManager().getUserByKey(issue.reporterId);
 def display_name = reporter.getDisplayName()
-def token = reporter.getUsername()
+def LoginName = reporter.getUsername()
 
-/* our Token field is the samAccountName */
+/* our LoginName field is the samAccountName */
 
 
-def fqdn_of_Manager = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Token\" IN (\""+token+"\") ",insightUserAttributeIdFqdnManager)
+def fqdn_of_Manager = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\") ",insightUserAttributeIdFqdnManager)
 log.info("FQDN of Manager : " + fqdn_of_Manager)
 def manager_user_name = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"FQDN\" IN (\""+fqdn_of_Manager+"\")",insightUserAttributeIdName)
 log.info("Manager User Name : " + manager_user_name)
