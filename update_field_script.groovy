@@ -137,4 +137,4 @@ insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\
 /*modify_insight_attribute(manager_field,insight_manager)*/
 def insight_manager_id =insight_manager.getId()
 log.info("Manager object id is : " + insight_manager_id)
-SetInsightValue(log, object.getId(),,insight_manager_id)
+SetInsightValue(log, object.getId(),manager_field,insight_manager_id)
