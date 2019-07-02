@@ -9,25 +9,28 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 
-final int user_status_locked = "16"
-final int user_status_password_never_expires = "66048"
-final int user_status_disabled = "514"
-final int user_status_enabled = "512"
+
 
 def get_decoded_user_state(user_status_code) {
+    log.info(user_status_code)
+    
+    final String user_status_locked = "16"
+	final String user_status_password_never_expires = "66048"
+	final String user_status_disabled = "514"
+	final String user_status_enabled = "512"
     if (user_status_code==user_status_locked) { 
-        return "Locked"
+        return 23
     }
     if (user_status_code==user_status_password_never_expires) { 
-        return "Technical Account"
+        return 22
     }
     if (user_status_code==user_status_disabled) { 
-        return "Disabled"
+        return 21
     }
     if (user_status_code==user_status_enabled) { 
-        return "Active"
+        return 20
     }
-    return "Unknown"
+    return 24
 }
 
 
@@ -130,6 +133,7 @@ final int customFieldApproversId = 10007;
 final int test_value_id = 208;
 final int account_field_id = 204;
 final int manager_field = 201;
+final int user_status_code_field = 205; 
 final int user_status_field = 206; 
 //def LoginName ="C154564";
 def LoginName =""
@@ -144,7 +148,8 @@ for(objectAttributeBean in object.getObjectAttributeBeans()){
 log.info(" found LoginName : " + LoginName)
 
 
-def account_status_code = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\") ",insightUserAttributeIdFqdnManager)
+def account_status_code = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\") ",user_status_code_field)
+log.info("status code is : " +account_status_code )
 def user_state = get_decoded_user_state(account_status_code)
 SetInsightValue(log, object.getId(),user_status_field,user_state)
 
