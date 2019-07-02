@@ -8,6 +8,29 @@ import com.atlassian.jira.issue.MutableIssue;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
+
+final int user_status_locked = "16"
+final int user_status_password_never_expires = "66048"
+final int user_status_disabled = "514"
+final int user_status_enabled = "512"
+
+def get_decoded_user_state(user_status_code) {
+    if (user_status_code==user_status_locked) { 
+        return "Locked"
+    }
+    if (user_status_code==user_status_password_never_expires) { 
+        return "Technical Account"
+    }
+    if (user_status_code==user_status_disabled) { 
+        return "Disabled"
+    }
+    if (user_status_code==user_status_enabled) { 
+        return "Active"
+    }
+    return "Unknown"
+}
+
+
 boolean SetInsightValue (def log, int InsightObjectId, int InsightAttributeId, def NewValue) {
  log.info("SetInsightValue function has been called.");
  
@@ -107,6 +130,7 @@ final int customFieldApproversId = 10007;
 final int test_value_id = 208;
 final int account_field_id = 204;
 final int manager_field = 201;
+final int user_status_field = 206; 
 //def LoginName ="C154564";
 def LoginName =""
 
@@ -120,8 +144,9 @@ for(objectAttributeBean in object.getObjectAttributeBeans()){
 log.info(" found LoginName : " + LoginName)
 
 
-
-
+def account_status_code = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\") ",insightUserAttributeIdFqdnManager)
+def user_state = get_decoded_user_state(account_status_code)
+SetInsightValue(log, object.getId(),user_status_field,user_state)
 
 //SetInsightValue(log, object.getId(), test_value_id, "another test value");
 // Get the FAD
@@ -134,7 +159,6 @@ insight_manager = get_object_from_iql_query(insightSchemaId,"objectType=\"Users\
 
 
 
-/*modify_insight_attribute(manager_field,insight_manager)*/
 def insight_manager_id =insight_manager.getId()
 log.info("Manager object id is : " + insight_manager_id)
 SetInsightValue(log, object.getId(),manager_field,insight_manager_id)

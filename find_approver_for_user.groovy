@@ -12,6 +12,11 @@ final int insightUserAttributeIdFqdnManager = 202;
 final int insightUserAttributeIdName = 195; 
 final int customFieldApproversId = 10007;
 
+final int account_status_code_field_id = 205
+
+
+
+
 def userSearchService = ComponentAccessor.getComponent(UserSearchService)
 def fqdnManager = "";
 def userName = "";
@@ -44,7 +49,6 @@ def display_name = reporter.getDisplayName()
 def LoginName = reporter.getUsername()
 
 /* our LoginName field is the samAccountName */
-
 
 def fqdn_of_Manager = get_field_from_iql_query(insightSchemaId,"objectType=\"Users\" AND \"Login Name\" IN (\""+LoginName+"\") ",insightUserAttributeIdFqdnManager)
 log.info("FQDN of Manager : " + fqdn_of_Manager)
