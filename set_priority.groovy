@@ -8,45 +8,28 @@ import com.atlassian.jira.issue.ModifiedValue;
 import com.atlassian.jira.issue.IssueInputParametersImpl
 import com.atlassian.jira.issue.comments.CommentManager;
 
-
-Priority_Blocker = new HashMap<String, List>();
-Priority_Critical = new HashMap<String, List>();
-Priority_High = new HashMap<String, List>();
-Priority_Medium = new HashMap<String, List>();
-Priority_Low = new HashMap<String, List>();
-
-
-Priority_Blocker.put("Extensive / Widespread", ["Critical"])
-Priority_Critical.put("Extensive / Widespread", ["High"])
-Priority_Critical.put("Significant / Large", ["Critical"])
-
-Priority_High.put("Significant / Large", ["Medium"])
-Priority_High.put("Moderate / Limited", ["High"])
-Priority_High.put("Extensive / Widespread", ["Medium"])
-
-Priority_Medium.put("Minor / Localized", ["Critical", "High"])
-Priority_Medium.put("Moderate / Limited", ["High", "Medium"])
-Priority_Medium.put("Significant / Large", ["Medium", "Low"])
-
-Priority_Low.put("Moderate / Limited", ["Low"])
-Priority_Low.put("Minor / Localized", ["Medium","Low"])
-
-
 def get_Priority(urgency,impact) {
-    urgency = ""+urgency
-    impact = ""+impact
     if (!urgency) { return "Minor"}
     if (!impact) { return "Minor"}
-    if (urgency in Priority_Blocker.get(impact)) { return "Blocker"}
-    if (urgency in Priority_Critical.get(impact)) { return "Critical"}
-    if (urgency in Priority_High.get(impact)) { return "High"}
-    if (urgency in Priority_Medium.get(impact)) { return "Medium"}
-    if (urgency in Priority_Low.get(impact)) { return "Low"}
+    urgency = ""+urgency
+    impact = ""+impact
+    def priorityMatrix = new HashMap<String, HashMap>();
+    priorityMatrix.put("Critical", ["Extensive / Widespread": "Blocker", "Significant / Large": "Blocker", "Moderate / Limited": "High", "Minor / Localized": "Medium"])
+    priorityMatrix.put("High" , ["Extensive / Widespread": "Blocker", "Significant / Large": "High", "Moderate / Limited": "Medium", "Minor / Localized": "Medium"])
+    priorityMatrix.put("Medium", ["Extensive / Widespread": "High", "Significant / Large": "Medium", "Moderate / Limited": "Medium", "Minor / Localized": "Minor"])
+    priorityMatrix.put("Low" , ["Extensive / Widespread": "Medium", "Significant / Large": "Medium", "Moderate / Limited": "Minor", "Minor / Localized": "Minor"])
+    def t =priorityMatrix.get(urgency)
+	log.info("test :" +t)
+    
+    def priority = t[impact]
+    log.info("priority :" +priority)
+	return priority
     }
 
 
 
-log.info(""+issue.priority.name)
+def issue = event.issue
+log.info(""+issue.priority.name) 
 
 def customFieldManager = ComponentAccessor.getCustomFieldManager()
 def constantsManager = ComponentAccessor.getConstantsManager()
@@ -59,11 +42,12 @@ def urgency = issue.getCustomFieldValue(urgency_field) ;
 def impact_field = customFieldManager.getCustomFieldObjectByName("Impact")
 def impact = issue.getCustomFieldValue(impact_field);
 
-priorityName=get_Priority(urgency, impact)
+def priorityName=get_Priority(urgency, impact)
 
-log.info("priorty is : " + priorityName)
+log.info("priority is : " + priorityName)
 
 def priority_objects = constantsManager.getPriorities()
+def priority =priority_objects[0]
 
 for (value in priority_objects) { if (value.name == priorityName) { 
     priority=value
@@ -80,8 +64,5 @@ def validationResult = issueService.validateUpdate(user, issue.id, issueInputPar
 if (validationResult.isValid()) {
     issueService.update(user, validationResult)
 } else {
-    log.warn validationResult.errorCollection.errors
+    log.warn(""+validationResult.errorCollection.errors)
 }
-
-
-
