@@ -28,19 +28,19 @@ def select_checkbox_value(int fieldid, value_name ) {
     IssueService issueService = ComponentAccessor.getComponent(IssueService);
     IssueInputParameters issueInputParameters = issueService.newIssueInputParameters()
     def customField=ComponentAccessor.getCustomFieldManager().getCustomFieldObject(fieldid);
-	def user = ComponentAccessor.getJiraAuthenticationContext().loggedInUser
-	Options options = optionsManager.getOptions(customField.getConfigurationSchemes().first().getOneAndOnlyConfig());
+    def user = ComponentAccessor.getJiraAuthenticationContext().loggedInUser
+    Options options = optionsManager.getOptions(customField.getConfigurationSchemes().first().getOneAndOnlyConfig());
     def optionToSelect = options.find { it.value == value_name } 
     IssueManager issueManager = ComponentAccessor.getIssueManager();
     issue.setCustomFieldValue(customField, [optionToSelect])
-	issueManager.updateIssue(user, issue, EventDispatchOption.DO_NOT_DISPATCH, false);
+    issueManager.updateIssue(user, issue, EventDispatchOption.DO_NOT_DISPATCH, false);
     issue.store();
     }
 
 def has_recieved_at_least_x_approvals(approvals_needed){
-	// We need to know who has already approved the request. 
+    // We need to know who has already approved the request. 
     // we use the api as the java classes dont seem to allow us to know it
-	def JIRA_API_URL = "https://jira"
+    def JIRA_API_URL = "https://jira"
      
     def jira = new HTTPBuilder(JIRA_API_URL);
     jira.client.addRequestInterceptor(new HttpRequestInterceptor() {
@@ -52,7 +52,7 @@ def has_recieved_at_least_x_approvals(approvals_needed){
     def resp = jira.get(path: '/rest/api/latest/issue/'+issue)
     approvers = resp['fields']['customfield_10000']['approvers']
  
-	approvals_count =0
+    approvals_count =0
     for (approver in approvers) { //Loop over approvers, if any has approved, increase approvals count
         log.info(""+approver['approver']['displayName'])
         log.info(""+approver['approverDecision'])
@@ -85,14 +85,13 @@ else
     //We should auto approve if the request is waiting for an approval (could be already approved)
     def status = resp['fields']['customfield_10001']['currentStatus']['status']
     if (status=="Waiting for approval"){
-		if (has_recieved_at_least_x_approvals(1)) {
-     		log.info("auto Approving")
+	if (has_recieved_at_least_x_approvals(1)) {
+     	    log.info("auto Approving")
             select_checkbox_value(auto_approve_field_id, "True")
     	}
     }
     else 
 	{
       log.info("already approved")
-    }
-}
+    } 
 }
