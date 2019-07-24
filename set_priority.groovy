@@ -14,19 +14,19 @@ def get_Priority(urgency,impact) {
     urgency = ""+urgency
     impact = ""+impact
     // The matrix is defining, for each Urgency => a corresponding Impact => priority value.
-    def priorityMatrix = new HashMap<String, HashMap>();
+	def priorityMatrix = new HashMap<String, HashMap>();
 	
     priorityMatrix.put("Critical", ["Extensive / Widespread": "Blocker", "Significant / Large": "Blocker", "Moderate / Limited": "High", "Minor / Localized": "Medium"])
     priorityMatrix.put("High" , ["Extensive / Widespread": "Blocker", "Significant / Large": "High", "Moderate / Limited": "Medium", "Minor / Localized": "Medium"])
     priorityMatrix.put("Medium", ["Extensive / Widespread": "High", "Significant / Large": "Medium", "Moderate / Limited": "Medium", "Minor / Localized": "Minor"])
     priorityMatrix.put("Low" , ["Extensive / Widespread": "Medium", "Significant / Large": "Medium", "Moderate / Limited": "Minor", "Minor / Localized": "Minor"])
     // Get the corresponding list for the referenced Urgency
-    def t =priorityMatrix.get(urgency)
-    log.info("test :" +t)
+	def t =priorityMatrix.get(urgency)
+	log.info("test :" +t)
     // Get priority using the impact value
     def priority = t[impact]
     log.info("priority :" +priority)
-    return priority
+	return priority
     }
 
 
@@ -38,12 +38,14 @@ def customFieldManager = ComponentAccessor.getCustomFieldManager()
 def constantsManager = ComponentAccessor.getConstantsManager()
 def issueService = ComponentAccessor.getIssueService()
 
-def user = ComponentAccessor.getJiraAuthenticationContext().getUser()
+//def user = ComponentAccessor.getJiraAuthenticationContext().getUser()
+def user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser()
 
-def urgency_field = customFieldManager.getCustomFieldObjectByName("Urgency")
-def urgency = issue.getCustomFieldValue(urgency_field) ;
-def impact_field = customFieldManager.getCustomFieldObjectByName("Impact")
-def impact = issue.getCustomFieldValue(impact_field);
+//def urgency_field = customFieldManager.getCustomFieldObjectByName("Urgency")
+def urgency_field = customFieldManager.getCustomFieldObjectsByName("Urgency")
+def urgency = issue.getCustomFieldValue(urgency_field[0]);
+def impact_field = customFieldManager.getCustomFieldObjectsByName("Impact")
+def impact = issue.getCustomFieldValue(impact_field[0]);
 
 def priorityName=get_Priority(urgency, impact)
 
