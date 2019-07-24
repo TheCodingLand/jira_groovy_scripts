@@ -53,7 +53,7 @@ def has_recieved_at_least_x_approvals(approvals_needed){
     approvers = resp['fields']['customfield_10000']['approvers']
  
 	approvals_count =0
-    for (approver in approvers) { //Loop over approvers, if any has approved, set approved to true
+    for (approver in approvers) { //Loop over approvers, if any has approved, increase approvals count
         log.info(""+approver['approver']['displayName'])
         log.info(""+approver['approverDecision'])
 		if ("approved" in approver['approverDecision'])
