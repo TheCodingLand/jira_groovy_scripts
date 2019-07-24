@@ -61,41 +61,38 @@ def has_recieved_at_least_x_approvals(approvals_needed){
 			
 			approvals_count +=1
 		}     
-        log.info(""+approved)
+        
     }
-	return approvals_count>=approvals_needed
+	def approved=approvals_count>=approvals_needed //true or false
+	log.info(""+approved)
+	return approved
 }
 
 
 
 
 //SCRIPT START
-
 def senior_approver_required_field = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(senior_approver_required_field_id);
 def senior_approver_required = issue.getCustomFieldValue(senior_approver_required_field)
-// we get the custom field value to determine if it is required to have a senior manager's approval
-
+//we get the custom field value to determine if it is required to have a senior manager's approval
 
 if (senior_approver_required){
 log.info("needs approval")
 
-
-else {
-	
-        
+} 
+else 
+{
     //We should auto approve if the request is waiting for an approval (could be already approved)
     def status = resp['fields']['customfield_10001']['currentStatus']['status']
-    
     if (status=="Waiting for approval"){
-      
 		if (has_recieved_at_least_x_approvals(1)) {
-        
      		log.info("auto Approving")
             select_checkbox_value(auto_approve_field_id, "True")
     	}
-        }
-       else {
-           log.info("already approved")
-           }
-	}
+    }
+    else 
+	{
+      log.info("already approved")
+    }
+}
 }
