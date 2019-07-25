@@ -15,7 +15,7 @@ import com.atlassian.jira.issue.customfields.option.Options
 
 
 def customFieldManager = ComponentAccessor.getCustomFieldManager()
-final int senior_approver_required_field_id = 10000;
+final int senior_approver_required_field_id = 10600;
 final int auto_approve_field_id = 10601;
 
 def auto_approve_field = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(auto_approve_field_id);
@@ -76,14 +76,14 @@ def has_recieved_at_least_x_approvals(resp,approvals_needed){
 
 
 
-def senior_approver_required_field = customFieldManager.getCustomFieldObjectByName("Senior Management Approval")
-def senior_approver_required = issue.getCustomFieldValue(senior_approver_required_field)
-log.info("Senior Approver Required ?" + senior_approver_required)
-//SCRIPT START
-//def senior_approver_required_field = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(senior_approver_required_field_id);
+//def senior_approver_required_field = customFieldManager.getCustomFieldObjectByName("Senior Management Approval")
 //def senior_approver_required = issue.getCustomFieldValue(senior_approver_required_field)
-//we get the custom field value to determine if it is required to have a senior manager's approval
 
+//SCRIPT START
+def senior_approver_required_field = ComponentAccessor.getCustomFieldManager().getCustomFieldObject(senior_approver_required_field_id);
+def senior_approver_required = issue.getCustomFieldValue(senior_approver_required_field)
+//we get the custom field value to determine if it is required to have a senior manager's approval
+log.info("Senior Approver Required ?" + senior_approver_required)
 if (senior_approver_required){
 log.info("needs approval")
 
